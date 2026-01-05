@@ -65,7 +65,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# CSS customizado
+# CSS customizado com estilos para tooltips e melhorias de UX
 st.markdown("""
 <style>
     .main-header {
@@ -76,49 +76,185 @@ st.markdown("""
         padding: 1rem 0;
     }
 
-        /* ESTILO DOS KPIs - BORDA PRETA */
+    /* ESTILO DOS KPIs - BORDA PRETA */
     div[data-testid="stMetric"] {
-        background-color: #ffffff;        /* Fundo branco */
-        border: 2px solid #2c3e50;        /* Borda: 2px de largura, sólida, cor cinza-escuro */
-        border-radius: 10px;              /* Cantos arredondados (10 pixels de raio) */
-        padding: 15px;                    /* Espaçamento interno (15px em todos os lados) */
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);  /* Sombra: horizontal=0, vertical=2px, blur=4px, cor preta 10% opacidade */
+        background-color: #ffffff;
+        border: 2px solid #2c3e50;
+        border-radius: 10px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-    
+
+    div[data-testid="stMetric"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+
     /* Título do métrica */
     div[data-testid="stMetric"] > label {
-        font-weight: 600;                 /* Negrito médio */
-        color: #2c3e50;                   /* Cor do texto */
+        font-weight: 600;
+        color: #2c3e50;
     }
-    
+
     /* Valor do métrica */
     div[data-testid="stMetricValue"] {
-        font-size: 1.8rem;                /* Tamanho da fonte do valor */
-        font-weight: bold;                /* Negrito */
-        color: #1f77b4;                   /* Cor azul */
+        font-size: 1.8rem;
+        font-weight: bold;
+        color: #1f77b4;
     }
-    
+
     /* Delta (variação) */
     div[data-testid="stMetricDelta"] {
-        font-size: 0.9rem;                /* Tamanho menor para delta */
-        
+        font-size: 0.9rem;
+    }
+
     .metric-card {
         background-color: #f0f2f6;
         padding: 1rem;
         border-radius: 0.5rem;
         border-left: 4px solid #1f77b4;
     }
+
     .alert-critico {
         background-color: #ffebee;
         padding: 1rem;
         border-radius: 0.5rem;
         border-left: 4px solid #d32f2f;
     }
+
     .alert-alto {
         background-color: #fff3e0;
         padding: 1rem;
         border-radius: 0.5rem;
         border-left: 4px solid #f57c00;
+    }
+
+    /* Estilos para tooltips customizados */
+    .tooltip-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .tooltip-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        background-color: #e3f2fd;
+        color: #1976d2;
+        border-radius: 50%;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: help;
+        margin-left: 5px;
+        border: 1px solid #1976d2;
+        transition: all 0.2s ease;
+    }
+
+    .tooltip-icon:hover {
+        background-color: #1976d2;
+        color: white;
+    }
+
+    .kpi-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border: 1px solid #e0e0e0;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .kpi-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+        transform: translateY(-2px);
+    }
+
+    .kpi-title {
+        font-size: 0.85rem;
+        color: #666;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .kpi-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: #1f77b4;
+        margin-bottom: 5px;
+    }
+
+    .kpi-help {
+        font-size: 0.75rem;
+        color: #888;
+        font-style: italic;
+        line-height: 1.3;
+        padding: 8px;
+        background-color: #f5f5f5;
+        border-radius: 6px;
+        margin-top: 8px;
+    }
+
+    .kpi-delta-positive {
+        color: #2e7d32;
+        font-size: 0.9rem;
+    }
+
+    .kpi-delta-negative {
+        color: #c62828;
+        font-size: 0.9rem;
+    }
+
+    /* Legenda de ajuda */
+    .help-section {
+        background-color: #e3f2fd;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 15px 0;
+        border-left: 4px solid #1976d2;
+    }
+
+    .help-section h4 {
+        color: #1565c0;
+        margin-bottom: 10px;
+    }
+
+    .help-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    .help-icon {
+        margin-right: 8px;
+        min-width: 20px;
+    }
+
+    /* Indicadores de status */
+    .status-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-critico { background-color: #ffcdd2; color: #c62828; }
+    .status-alto { background-color: #ffe0b2; color: #e65100; }
+    .status-medio { background-color: #fff9c4; color: #f9a825; }
+    .status-baixo { background-color: #c8e6c9; color: #2e7d32; }
+    .status-normal { background-color: #e8f5e9; color: #388e3c; }
+
+    /* Expander customizado */
+    .streamlit-expanderHeader {
+        background-color: #f8f9fa;
+        border-radius: 8px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -565,6 +701,117 @@ def criar_gauge_aliquota(aliq_mediana, aliq_p25, aliq_p75):
     fig.update_layout(height=300)
     return fig
 
+def metric_with_tooltip(label, value, tooltip, delta=None, delta_color="normal"):
+    """
+    Exibe uma métrica com tooltip explicativo.
+
+    Args:
+        label: Título do KPI
+        value: Valor a ser exibido
+        tooltip: Texto explicativo do indicador
+        delta: Valor de variação (opcional)
+        delta_color: Cor do delta - "normal", "inverse", ou "off"
+    """
+    st.metric(label=label, value=value, delta=delta, delta_color=delta_color,
+              help=tooltip)
+
+def render_kpi_card(icon, title, value, tooltip, color="#1f77b4"):
+    """
+    Renderiza um card KPI customizado com tooltip.
+
+    Args:
+        icon: Emoji ou ícone
+        title: Título do KPI
+        value: Valor formatado
+        tooltip: Texto explicativo
+        color: Cor do valor
+    """
+    st.markdown(f"""
+    <div class="kpi-card">
+        <div class="kpi-title">{icon} {title}</div>
+        <div class="kpi-value" style="color: {color};">{value}</div>
+        <div class="kpi-help">{tooltip}</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+def render_help_section(title, items):
+    """
+    Renderiza uma seção de ajuda com explicações dos indicadores.
+
+    Args:
+        title: Título da seção
+        items: Lista de tuplas (ícone, texto)
+    """
+    items_html = ""
+    for icon, text in items:
+        items_html += f'<div class="help-item"><span class="help-icon">{icon}</span>{text}</div>'
+
+    st.markdown(f"""
+    <div class="help-section">
+        <h4>{title}</h4>
+        {items_html}
+    </div>
+    """, unsafe_allow_html=True)
+
+# Dicionário centralizado de tooltips para reutilização
+TOOLTIPS = {
+    # Visão Geral
+    "setores_monitorados": "Total de setores econômicos (CNAE) sendo monitorados no período. Cada setor representa um grupo de empresas com atividade econômica similar.",
+    "empresas": "Quantidade total de empresas ativas no período selecionado, identificadas por CNPJ único.",
+    "faturamento_total": "Soma do faturamento declarado por todas as empresas no período. Valores em bilhões de reais (B).",
+    "aliquota_media": "Média ponderada das alíquotas efetivas de ICMS praticadas por todas as empresas. Indica a carga tributária média do estado.",
+
+    # Análise Setorial
+    "empresas_setor": "Número de empresas ativas no setor selecionado durante o período de referência.",
+    "faturamento_setor": "Faturamento total declarado pelas empresas do setor. Valores em milhões (M) ou bilhões (B).",
+    "aliquota_mediana": "Valor central das alíquotas efetivas do setor. 50% das empresas têm alíquota abaixo e 50% acima deste valor. Mais robusto que a média.",
+    "coef_variacao": "Coeficiente de Variação - mede a dispersão das alíquotas no setor. Valores > 0.3 indicam alta heterogeneidade fiscal.",
+    "categoria_volatilidade": "Classificação da estabilidade do setor: BAIXA (estável), MÉDIA (moderada) ou ALTA (instável).",
+    "tendencia_aliquota": "Direção da variação da alíquota nos últimos períodos: CRESCENTE, ESTÁVEL ou DECRESCENTE.",
+    "aliquota_media_8m": "Média da alíquota efetiva mediana nos últimos 8 meses. Útil para identificar padrões de longo prazo.",
+
+    # Análise Empresarial
+    "faturamento_empresa": "Valor total das vendas/receitas declaradas pela empresa no período.",
+    "icms_devido": "Valor do ICMS calculado como devido pela empresa, baseado nas operações declaradas.",
+    "aliquota_empresa": "Taxa efetiva de ICMS da empresa = (ICMS Devido / Faturamento) x 100. Indica a carga tributária real.",
+    "aliquota_setor_ref": "Alíquota mediana do setor de atuação da empresa. Serve como referência para comparação.",
+    "indice_vs_setor": "Relação entre alíquota da empresa e do setor. Valores < 1 indicam tributação abaixo do esperado.",
+    "status_vs_setor": "Classificação comparativa: MUITO_ABAIXO (<50% da mediana), ABAIXO (50-80%), NORMAL (80-120%), ACIMA (>120%).",
+
+    # Volatilidade
+    "alta_volatilidade": "Empresas com Coeficiente de Variação > 0.5 nos últimos 8 meses. Alto risco de comportamento fiscal irregular.",
+    "media_volatilidade": "Empresas com CV entre 0.2 e 0.5. Requerem monitoramento preventivo.",
+    "baixa_volatilidade": "Empresas com CV < 0.2. Comportamento fiscal estável e previsível.",
+    "cv_medio": "Média do Coeficiente de Variação de todas as empresas. Quanto maior, mais instável o universo fiscal.",
+
+    # Alertas
+    "total_alertas": "Quantidade total de situações anômalas identificadas pelo sistema no período.",
+    "alertas_criticos": "Alertas de maior gravidade que requerem ação imediata. Score de risco > 80.",
+    "alertas_altos": "Alertas importantes que devem ser priorizados. Score de risco entre 60-80.",
+    "alertas_medios": "Alertas que requerem atenção mas não são urgentes. Score de risco entre 40-60.",
+    "score_risco": "Pontuação de 0 a 100 que indica a probabilidade de irregularidade fiscal. Calculado com base em múltiplos fatores.",
+
+    # Pagamentos
+    "total_pago": "Soma de todos os pagamentos de ICMS realizados no período.",
+    "qtd_pagamentos": "Número total de guias de pagamento processadas no período.",
+    "empresas_pagantes": "Quantidade de empresas distintas que realizaram pelo menos um pagamento.",
+    "ticket_medio": "Valor médio por pagamento = Total Pago / Quantidade de Pagamentos.",
+    "divergencia_pagamento": "Diferença significativa (>30%) entre ICMS declarado como devido e valor efetivamente pago.",
+
+    # Machine Learning
+    "acuracia": "Percentual de previsões corretas do modelo. Quanto maior, melhor a performance geral.",
+    "precisao": "Dos casos previstos como problemáticos, quantos realmente são. Evita falsos positivos.",
+    "recall": "Dos casos realmente problemáticos, quantos foram identificados. Evita falsos negativos.",
+    "f1_score": "Média harmônica entre Precisão e Recall. Melhor métrica para dados desbalanceados.",
+    "prob_risco": "Probabilidade (0-100%) de uma empresa apresentar comportamento fiscal problemático.",
+
+    # Evolução Temporal
+    "periodos_analisados": "Quantidade de meses com dados disponíveis para o setor/empresa selecionado.",
+    "desvio_padrao": "Medida de dispersão das alíquotas ao longo do tempo. Valores altos indicam instabilidade.",
+    "amplitude": "Diferença entre a maior e menor alíquota observada no período. Mede a variação extrema.",
+    "tendencia_percentual": "Variação percentual entre o primeiro e último período analisado."
+}
+
 # =============================================================================
 # 5. INTERFACE PRINCIPAL (OTIMIZADA)
 # =============================================================================
@@ -594,7 +841,26 @@ def main():
     # Sidebar - Navegação
     st.sidebar.title("🔐 Navegação")
     st.sidebar.success("✅ Conexão estabelecida!")
-    
+
+    # Guia rápido de navegação
+    with st.sidebar.expander("❓ Guia Rápido", expanded=False):
+        st.markdown("""
+        **Como usar o sistema:**
+
+        1. **Visão Geral**: Panorama rápido do período
+        2. **Análise Setorial**: Detalhes por setor econômico
+        3. **Análise Empresarial**: Busca e análise por CNPJ
+        4. **Alertas**: Empresas com comportamento atípico
+        5. **Evolução**: Tendências históricas
+        6. **Volatilidade**: Estabilidade fiscal
+        7. **Pagamentos**: ICMS declarado vs pago
+        8. **ML**: Modelos preditivos de risco
+        9. **Avançadas**: Análises complementares
+        10. **Relatórios**: Resumos executivos
+
+        💡 **Dica**: Passe o mouse sobre os indicadores (?) para ver explicações detalhadas.
+        """)
+
     secao = st.sidebar.radio(
         "Escolha a análise:",
         [
@@ -608,17 +874,37 @@ def main():
             "🤖 Machine Learning",
             "📊 Análises Avançadas",
             "📋 Relatórios"
-        ]
+        ],
+        help="Selecione a seção do dashboard que deseja visualizar."
     )
-    
+
     # Info na sidebar
     st.sidebar.markdown("---")
     st.sidebar.info(f"📅 {len(periodos)} períodos disponíveis")
-    
+
+    # Legenda de cores
+    with st.sidebar.expander("🎨 Legenda de Cores", expanded=False):
+        st.markdown("""
+        **Indicadores de Status:**
+        - 🟢 **Verde**: Normal / Bom / Baixo risco
+        - 🟡 **Amarelo**: Atenção / Médio
+        - 🟠 **Laranja**: Alto / Importante
+        - 🔴 **Vermelho**: Crítico / Urgente
+
+        **Tendências:**
+        - 📈 Crescente
+        - 📉 Decrescente
+        - ➡️ Estável
+        """)
+
     # Botão para limpar cache
-    if st.sidebar.button("🔄 Limpar Cache"):
+    if st.sidebar.button("🔄 Limpar Cache", help="Recarrega todos os dados do banco de dados."):
         st.cache_data.clear()
         st.rerun()
+
+    # Versão do sistema
+    st.sidebar.markdown("---")
+    st.sidebar.caption("ARGOS Setores v4.1 | SEF/SC")
     
     # Período padrão (mais recente)
     periodo_padrao = periodos[0] if periodos else None
@@ -651,43 +937,57 @@ def main():
 
 def render_visao_geral_v2(engine, periodos, periodo_padrao):
     st.header("📈 Visão Geral do Sistema")
-    
+
+    # Seção de ajuda expandível
+    with st.expander("ℹ️ Entenda os indicadores desta seção", expanded=False):
+        render_help_section("📊 Indicadores Principais", [
+            ("🏭", "**Setores Monitorados**: Total de classificações CNAE (atividades econômicas) presentes na base."),
+            ("🏢", "**Empresas**: Quantidade de CNPJs únicos com movimentação no período."),
+            ("💰", "**Faturamento Total**: Soma das receitas declaradas por todas as empresas (em bilhões)."),
+            ("📊", "**Alíquota Média**: Média das taxas efetivas de ICMS - indica a carga tributária média.")
+        ])
+
     # Filtro de período
-    periodo = st.selectbox("📅 Período de Referência", periodos, index=0)
-    
+    periodo = st.selectbox("📅 Período de Referência", periodos, index=0,
+                          help="Selecione o mês/ano para análise. Dados são atualizados mensalmente.")
+
     # Carregar dados do período selecionado
     with st.spinner("Carregando dados do período..."):
         df_periodo = carregar_benchmark_setorial(engine, periodo)
         df_empresas = carregar_empresas(engine, periodo)
         df_alertas = carregar_alertas(engine, periodo)
-    
+
     # KPIs principais
     col1, col2, col3, col4 = st.columns(4)
-    
+
     with col1:
         st.metric(
             "🏭 Setores Monitorados",
-            f"{len(df_periodo):,}" if not df_periodo.empty else "0"
+            f"{len(df_periodo):,}" if not df_periodo.empty else "0",
+            help=TOOLTIPS["setores_monitorados"]
         )
-    
+
     with col2:
         st.metric(
             "🏢 Empresas",
-            f"{df_empresas['nu_cnpj'].nunique():,}" if not df_empresas.empty else "0"
+            f"{df_empresas['nu_cnpj'].nunique():,}" if not df_empresas.empty else "0",
+            help=TOOLTIPS["empresas"]
         )
-    
+
     with col3:
         fat_total = df_periodo['faturamento_total'].sum() / 1e9 if not df_periodo.empty else 0
         st.metric(
             "💰 Faturamento Total",
-            f"R$ {fat_total:.2f}B"
+            f"R$ {fat_total:.2f}B",
+            help=TOOLTIPS["faturamento_total"]
         )
-    
+
     with col4:
         aliq_media = df_periodo['aliq_efetiva_mediana'].mean() * 100 if not df_periodo.empty else 0
         st.metric(
             "📊 Alíquota Média",
-            f"{aliq_media:.2f}%"
+            f"{aliq_media:.2f}%",
+            help=TOOLTIPS["aliquota_media"]
         )
     
     st.markdown("---")
@@ -763,47 +1063,78 @@ def render_visao_geral_v2(engine, periodos, periodo_padrao):
 
 def render_analise_setorial_v2(engine, periodos, periodo_padrao):
     st.header("🏭 Análise Setorial Detalhada")
-    
+
+    # Seção de ajuda expandível
+    with st.expander("ℹ️ Entenda os indicadores desta seção", expanded=False):
+        render_help_section("📊 Indicadores Setoriais", [
+            ("🏢", "**Empresas**: Quantidade de empresas ativas no setor durante o período."),
+            ("💰", "**Faturamento**: Total de receitas declaradas por todas as empresas do setor."),
+            ("📊", "**Alíquota Mediana**: Valor central da distribuição de alíquotas - metade das empresas está acima, metade abaixo."),
+            ("📈", "**Coef. Variação**: Mede a dispersão das alíquotas. CV > 0.3 indica alta heterogeneidade no setor."),
+            ("🎯", "**P25/P75**: Percentis 25 e 75 - definem a faixa onde estão 50% das empresas centrais.")
+        ])
+
     # Filtro de período
-    periodo = st.selectbox("📅 Período de Referência", periodos, index=0)
-    
+    periodo = st.selectbox("📅 Período de Referência", periodos, index=0,
+                          help="Selecione o período para análise setorial detalhada.")
+
     # Carregar dados do período
     with st.spinner("Carregando dados setoriais..."):
         df_setor = carregar_benchmark_setorial(engine, periodo)
         df_evolucao = carregar_evolucao_setor(engine)
-    
+
     if df_setor.empty:
         st.warning("⚠️ Sem dados para o período selecionado")
         return
-    
+
     # Seletor de setor
     setores = sorted([s for s in df_setor['desc_cnae_classe'].unique() if s is not None and pd.notna(s)])
     if not setores:
         st.warning("Sem setores disponíveis para o período")
         return
-    setor_selecionado = st.selectbox("🔍 Selecione um setor:", setores)
-    
+    setor_selecionado = st.selectbox("🔍 Selecione um setor:", setores,
+                                     help="Escolha o setor econômico (CNAE) para análise detalhada.")
+
     # Filtrar dados do setor
     setor_data = df_setor[df_setor['desc_cnae_classe'] == setor_selecionado].iloc[0]
     cnae_classe = setor_data['cnae_classe']
-    
+
     # KPIs do setor
     col1, col2, col3, col4 = st.columns(4)
-    
+
     with col1:
-        st.metric("🏢 Empresas", f"{int(setor_data['qtd_empresas_total']):,}")
-    
+        st.metric(
+            "🏢 Empresas",
+            f"{int(setor_data['qtd_empresas_total']):,}",
+            help=TOOLTIPS["empresas_setor"]
+        )
+
     with col2:
         fat = setor_data['faturamento_total'] / 1e6
-        st.metric("💰 Faturamento", f"R$ {fat:.2f}M")
-    
+        st.metric(
+            "💰 Faturamento",
+            f"R$ {fat:.2f}M",
+            help=TOOLTIPS["faturamento_setor"]
+        )
+
     with col3:
         aliq = setor_data['aliq_efetiva_mediana'] * 100
-        st.metric("📊 Alíquota Mediana", f"{aliq:.2f}%")
-    
+        st.metric(
+            "📊 Alíquota Mediana",
+            f"{aliq:.2f}%",
+            help=TOOLTIPS["aliquota_mediana"]
+        )
+
     with col4:
         cv = setor_data['aliq_coef_variacao']
-        st.metric("📈 Coef. Variação", f"{cv:.3f}")
+        cv_status = "🔴 Alto" if cv > 0.3 else ("🟡 Médio" if cv > 0.15 else "🟢 Baixo")
+        st.metric(
+            "📈 Coef. Variação",
+            f"{cv:.3f}",
+            delta=cv_status,
+            delta_color="off",
+            help=TOOLTIPS["coef_variacao"]
+        )
     
     st.markdown("---")
     
@@ -849,20 +1180,27 @@ def render_analise_setorial_v2(engine, periodos, periodo_padrao):
             # Métricas de evolução
             col1, col2, col3 = st.columns(3)
             with col1:
+                volatilidade = setor_evolucao.iloc[0]['categoria_volatilidade_temporal']
+                vol_icon = "🔴" if volatilidade == "ALTA" else ("🟡" if volatilidade == "MEDIA" else "🟢")
                 st.metric(
                     "🎯 Categoria Volatilidade",
-                    setor_evolucao.iloc[0]['categoria_volatilidade_temporal']
+                    f"{vol_icon} {volatilidade}",
+                    help=TOOLTIPS["categoria_volatilidade"]
                 )
             with col2:
+                tendencia = setor_evolucao.iloc[0]['tendencia_aliquota']
+                tend_icon = "📈" if tendencia == "CRESCENTE" else ("📉" if tendencia == "DECRESCENTE" else "➡️")
                 st.metric(
                     "📊 Tendência",
-                    setor_evolucao.iloc[0]['tendencia_aliquota']
+                    f"{tend_icon} {tendencia}",
+                    help=TOOLTIPS["tendencia_aliquota"]
                 )
             with col3:
                 aliq_8m = setor_evolucao.iloc[0]['aliq_mediana_media_8m'] * 100
                 st.metric(
                     "📈 Alíquota Média 8m",
-                    f"{aliq_8m:.2f}%"
+                    f"{aliq_8m:.2f}%",
+                    help=TOOLTIPS["aliquota_media_8m"]
                 )
     
     # Distribuição por porte
@@ -903,12 +1241,25 @@ def render_analise_setorial_v2(engine, periodos, periodo_padrao):
 
 def render_analise_empresarial_v2(engine, periodos, periodo_padrao):
     st.header("🏢 Análise Empresarial")
-    
+
+    # Seção de ajuda expandível
+    with st.expander("ℹ️ Entenda os indicadores desta seção", expanded=False):
+        render_help_section("📊 Indicadores Empresariais", [
+            ("💰", "**Faturamento**: Receita bruta declarada pela empresa no período."),
+            ("💵", "**ICMS Devido**: Valor calculado de ICMS a pagar com base nas operações."),
+            ("📊", "**Alíquota Empresa**: Taxa efetiva = (ICMS / Faturamento) x 100."),
+            ("📈", "**Alíquota Setor**: Mediana do setor - referência para comparação."),
+            ("🎯", "**Índice vs Setor**: Razão entre alíquota da empresa e do setor. < 1 = abaixo da média."),
+            ("⚠️", "**Status**: Classificação comparativa (MUITO_ABAIXO, ABAIXO, NORMAL, ACIMA).")
+        ])
+
     # Filtro de período
-    periodo = st.selectbox("📅 Período de Referência", periodos, index=0)
-    
+    periodo = st.selectbox("📅 Período de Referência", periodos, index=0,
+                          help="Período para consulta dos dados da empresa.")
+
     # Busca de empresa - NÃO carrega dados automaticamente
-    cnpj_busca = st.text_input("🔍 Buscar CNPJ (apenas números):", max_chars=14)
+    cnpj_busca = st.text_input("🔍 Buscar CNPJ (apenas números):", max_chars=14,
+                               help="Digite o CNPJ completo sem pontuação para buscar os dados da empresa.")
     
     if cnpj_busca:
         # Busca específica por CNPJ
@@ -935,15 +1286,19 @@ def render_analise_empresarial_v2(engine, periodos, periodo_padrao):
                 st.info(f"**Porte:** {emp['porte_empresa']}")
             
             with col2:
-                st.metric("💰 Faturamento", formatar_moeda(emp['vl_faturamento']))
-                st.metric("💵 ICMS Devido", formatar_moeda(emp['icms_devido']))
-            
+                st.metric("💰 Faturamento", formatar_moeda(emp['vl_faturamento']),
+                         help=TOOLTIPS["faturamento_empresa"])
+                st.metric("💵 ICMS Devido", formatar_moeda(emp['icms_devido']),
+                         help=TOOLTIPS["icms_devido"])
+
             with col3:
                 aliq_emp = emp['aliq_efetiva_empresa'] * 100 if pd.notna(emp['aliq_efetiva_empresa']) else 0
                 aliq_setor = emp['aliq_setor_mediana'] * 100 if pd.notna(emp['aliq_setor_mediana']) else 0
-                
-                st.metric("📊 Alíquota Empresa", f"{aliq_emp:.2f}%")
-                st.metric("📊 Alíquota Setor", f"{aliq_setor:.2f}%")
+
+                st.metric("📊 Alíquota Empresa", f"{aliq_emp:.2f}%",
+                         help=TOOLTIPS["aliquota_empresa"])
+                st.metric("📊 Alíquota Setor", f"{aliq_setor:.2f}%",
+                         help=TOOLTIPS["aliquota_setor_ref"])
             
             # Status comparativo
             st.markdown("---")
@@ -961,12 +1316,17 @@ def render_analise_empresarial_v2(engine, periodos, periodo_padrao):
                 }
                 
                 st.info(f"{status_color.get(emp['status_vs_setor'], '⚪')} Status: **{emp['status_vs_setor']}**")
-                
+                st.caption(TOOLTIPS["status_vs_setor"])
+
                 if pd.notna(emp['indice_vs_mediana_setor']):
+                    indice = emp['indice_vs_mediana_setor']
+                    delta_pct = (indice - 1) * 100
                     st.metric(
                         "Índice vs Setor",
-                        f"{emp['indice_vs_mediana_setor']:.2f}",
-                        delta=f"{(emp['indice_vs_mediana_setor'] - 1) * 100:.1f}%"
+                        f"{indice:.2f}",
+                        delta=f"{delta_pct:+.1f}%",
+                        delta_color="normal" if delta_pct >= 0 else "inverse",
+                        help=TOOLTIPS["indice_vs_setor"]
                     )
             
             with col2:
@@ -1095,38 +1455,50 @@ def render_analise_empresarial_v2(engine, periodos, periodo_padrao):
 
 def render_evolucao_temporal_v2(engine, periodos):
     st.header("⏱️ Evolução Temporal por CNAE")
-    
+
+    # Seção de ajuda expandível
+    with st.expander("ℹ️ Entenda os indicadores desta seção", expanded=False):
+        render_help_section("📊 Indicadores de Evolução Temporal", [
+            ("📊", "**Períodos Analisados**: Quantidade de meses com dados disponíveis para análise histórica."),
+            ("🏢", "**Empresas (Média)**: Média de empresas ativas ao longo de todos os períodos."),
+            ("💰", "**Faturamento Total**: Soma acumulada do faturamento em todos os períodos."),
+            ("📈", "**Mediana/Média**: A mediana é mais robusta a outliers; a média considera todos os valores."),
+            ("📉", "**Amplitude**: Diferença entre maior e menor alíquota - indica a variação extrema."),
+            ("🔄", "**Tendência**: Variação percentual entre primeiro e último período analisado.")
+        ])
+
     # Carregar dados de benchmark de todos os períodos
     with st.spinner("Carregando dados de benchmark..."):
         df_benchmark = carregar_benchmark_setorial_todos_periodos(engine)
-    
+
     if df_benchmark.empty:
         st.warning("Sem dados de benchmark disponíveis")
         return
-    
+
     # Seletor de CNAE
     cnaes_raw = [
-        (cnae, desc) for cnae, desc in 
+        (cnae, desc) for cnae, desc in
         zip(df_benchmark['cnae_classe'], df_benchmark['desc_cnae_classe'])
         if cnae is not None and pd.notna(cnae) and desc is not None and pd.notna(desc)
     ]
-    
+
     if not cnaes_raw:
         st.warning("Sem CNAEs disponíveis")
         return
-    
+
     # Ordenar e remover duplicados
     try:
         cnaes = sorted(list(set(cnaes_raw)), key=lambda x: str(x[1]))
     except:
         cnaes = list(set(cnaes_raw))
-    
+
     # Criar dicionário para o selectbox
     cnae_dict = {f"{cnae} - {desc}": cnae for cnae, desc in cnaes}
-    
+
     cnae_selecionado_str = st.selectbox(
         "🔍 Selecione o CNAE:",
-        list(cnae_dict.keys())
+        list(cnae_dict.keys()),
+        help="Escolha um setor para visualizar sua evolução histórica de indicadores."
     )
     
     cnae_selecionado = cnae_dict[cnae_selecionado_str]
@@ -1153,12 +1525,15 @@ def render_evolucao_temporal_v2(engine, periodos):
     
     col1, col2, col3 = st.columns(3)
     with col1:
-        st.metric("📊 Períodos Analisados", len(df_cnae))
+        st.metric("📊 Períodos Analisados", len(df_cnae),
+                 help=TOOLTIPS["periodos_analisados"])
     with col2:
-        st.metric("🏢 Empresas (Média)", f"{df_cnae['qtd_empresas_total'].mean():.0f}")
+        st.metric("🏢 Empresas (Média)", f"{df_cnae['qtd_empresas_total'].mean():.0f}",
+                 help="Média de empresas ativas por período no setor selecionado.")
     with col3:
         fat_total = df_cnae['faturamento_total'].sum() / 1e9
-        st.metric("💰 Faturamento Total", f"R$ {fat_total:.2f}B")
+        st.metric("💰 Faturamento Total", f"R$ {fat_total:.2f}B",
+                 help="Soma acumulada do faturamento de todas as empresas em todos os períodos.")
     
     # Gráfico principal - Evolução da Alíquota
     st.markdown("---")
@@ -1282,38 +1657,43 @@ def render_evolucao_temporal_v2(engine, periodos):
     st.subheader("📊 Estatísticas do Período")
     
     col1, col2, col3, col4 = st.columns(4)
-    
+
     with col1:
         st.metric(
             "Alíquota Média",
-            f"{df_cnae['aliq_mediana_pct'].mean():.2f}%"
+            f"{df_cnae['aliq_mediana_pct'].mean():.2f}%",
+            help="Média aritmética das alíquotas medianas ao longo de todos os períodos analisados."
         )
-    
+
     with col2:
         variacao = df_cnae['aliq_mediana_pct'].std()
         st.metric(
             "Desvio Padrão",
-            f"{variacao:.2f} p.p."
+            f"{variacao:.2f} p.p.",
+            help=TOOLTIPS["desvio_padrao"]
         )
-    
+
     with col3:
         aliq_min = df_cnae['aliq_mediana_pct'].min()
         aliq_max = df_cnae['aliq_mediana_pct'].max()
         st.metric(
             "Amplitude",
-            f"{aliq_max - aliq_min:.2f} p.p."
+            f"{aliq_max - aliq_min:.2f} p.p.",
+            help=TOOLTIPS["amplitude"]
         )
-    
+
     with col4:
         # Tendência (primeiro vs último)
         if len(df_cnae) >= 2:
             primeiro = df_cnae.iloc[0]['aliq_mediana_pct']
             ultimo = df_cnae.iloc[-1]['aliq_mediana_pct']
             tendencia = ((ultimo - primeiro) / primeiro * 100) if primeiro > 0 else 0
+            tend_icon = "📈" if tendencia > 0 else ("📉" if tendencia < 0 else "➡️")
             st.metric(
                 "Tendência",
-                f"{tendencia:+.1f}%",
-                delta=f"{ultimo - primeiro:+.2f} p.p."
+                f"{tend_icon} {tendencia:+.1f}%",
+                delta=f"{ultimo - primeiro:+.2f} p.p.",
+                help=TOOLTIPS["tendencia_percentual"]
             )
     
     # Nova seção: Setores Normais e Anormais
@@ -1456,33 +1836,50 @@ def render_evolucao_temporal_v2(engine, periodos):
 def render_analise_volatilidade_v2(engine, periodos, periodo_padrao):
     st.header("📉 Análise de Volatilidade Empresarial")
     st.markdown("Identifique empresas e setores com comportamento fiscal instável ao longo do tempo.")
-    
+
+    # Seção de ajuda expandível
+    with st.expander("ℹ️ Entenda os indicadores desta seção", expanded=False):
+        render_help_section("📊 Indicadores de Volatilidade", [
+            ("🔴", "**Alta Volatilidade**: Empresas com CV > 0.5 - comportamento muito instável, alto risco."),
+            ("🟡", "**Média Volatilidade**: Empresas com CV entre 0.2 e 0.5 - requerem monitoramento."),
+            ("🟢", "**Baixa Volatilidade**: Empresas com CV < 0.2 - comportamento estável e previsível."),
+            ("📊", "**CV (Coef. Variação)**: Razão entre desvio padrão e média. Quanto maior, mais instável."),
+            ("⚠️", "Empresas com alta volatilidade podem indicar planejamento tributário agressivo ou irregularidades.")
+        ])
+
     # Carregar dados de evolução de empresas
     with st.spinner("Carregando dados de volatilidade..."):
         df_evolucao = carregar_evolucao_empresa(engine)
-    
+
     if df_evolucao.empty:
         st.warning("⚠️ Dados de evolução temporal não disponíveis")
         return
-    
+
     # Métricas gerais
     col1, col2, col3, col4 = st.columns(4)
-    
+
     with col1:
         alta_vol = len(df_evolucao[df_evolucao['categoria_volatilidade'] == 'ALTA'])
-        st.metric("🔴 Alta Volatilidade", f"{alta_vol:,}")
-    
+        st.metric("🔴 Alta Volatilidade", f"{alta_vol:,}",
+                 help=TOOLTIPS["alta_volatilidade"])
+
     with col2:
         media_vol = len(df_evolucao[df_evolucao['categoria_volatilidade'] == 'MEDIA'])
-        st.metric("🟡 Média Volatilidade", f"{media_vol:,}")
-    
+        st.metric("🟡 Média Volatilidade", f"{media_vol:,}",
+                 help=TOOLTIPS["media_volatilidade"])
+
     with col3:
         baixa_vol = len(df_evolucao[df_evolucao['categoria_volatilidade'] == 'BAIXA'])
-        st.metric("🟢 Baixa Volatilidade", f"{baixa_vol:,}")
-    
+        st.metric("🟢 Baixa Volatilidade", f"{baixa_vol:,}",
+                 help=TOOLTIPS["baixa_volatilidade"])
+
     with col4:
         cv_medio = df_evolucao['aliq_coef_variacao_8m'].mean() if 'aliq_coef_variacao_8m' in df_evolucao.columns else 0
-        st.metric("📊 CV Médio", f"{cv_medio:.3f}")
+        cv_status = "🔴 Alto" if cv_medio > 0.3 else ("🟡 Médio" if cv_medio > 0.15 else "🟢 Baixo")
+        st.metric("📊 CV Médio", f"{cv_medio:.3f}",
+                 delta=cv_status,
+                 delta_color="off",
+                 help=TOOLTIPS["cv_medio"])
     
     # Distribuição por categoria
     st.markdown("---")
@@ -1592,34 +1989,49 @@ def render_analise_volatilidade_v2(engine, periodos, periodo_padrao):
 
 def render_alertas_anomalias_v2(engine, periodos, periodo_padrao):
     st.header("⚠️ Alertas e Anomalias")
-    
+
+    # Seção de ajuda expandível
+    with st.expander("ℹ️ Entenda os indicadores desta seção", expanded=False):
+        render_help_section("📊 Sistema de Alertas", [
+            ("🔴", "**CRÍTICO**: Situações que requerem ação imediata. Score > 80. Alta probabilidade de irregularidade."),
+            ("🟠", "**ALTO**: Alertas importantes para priorização. Score 60-80. Monitoramento intensivo."),
+            ("🟡", "**MÉDIO**: Alertas que requerem atenção. Score 40-60. Acompanhamento preventivo."),
+            ("🟢", "**BAIXO**: Alertas informativos. Score < 40. Verificação quando possível."),
+            ("📊", "**Score de Risco**: Pontuação 0-100 baseada em múltiplos fatores (desvio da mediana, volatilidade, divergências).")
+        ])
+
     # Filtro de período
-    periodo = st.selectbox("📅 Período de Referência", periodos, index=0)
-    
+    periodo = st.selectbox("📅 Período de Referência", periodos, index=0,
+                          help="Selecione o período para visualizar os alertas gerados.")
+
     # Carregar dados
     with st.spinner("Carregando alertas..."):
         df_alertas = carregar_alertas(engine, periodo)
         df_anomalias = carregar_anomalias(engine, periodo)
-    
+
     # Resumo de alertas
     col1, col2, col3, col4 = st.columns(4)
-    
+
     if not df_alertas.empty:
         with col1:
             total = len(df_alertas)
-            st.metric("📋 Total Alertas", f"{total:,}")
-        
+            st.metric("📋 Total Alertas", f"{total:,}",
+                     help=TOOLTIPS["total_alertas"])
+
         with col2:
             criticos = len(df_alertas[df_alertas['severidade'] == 'CRITICO'])
-            st.metric("🔴 Críticos", f"{criticos:,}")
-        
+            st.metric("🔴 Críticos", f"{criticos:,}",
+                     help=TOOLTIPS["alertas_criticos"])
+
         with col3:
             altos = len(df_alertas[df_alertas['severidade'] == 'ALTO'])
-            st.metric("🟠 Altos", f"{altos:,}")
-        
+            st.metric("🟠 Altos", f"{altos:,}",
+                     help=TOOLTIPS["alertas_altos"])
+
         with col4:
             medios = len(df_alertas[df_alertas['severidade'] == 'MEDIO'])
-            st.metric("🟡 Médios", f"{medios:,}")
+            st.metric("🟡 Médios", f"{medios:,}",
+                     help=TOOLTIPS["alertas_medios"])
     
     # Filtro de alertas
     st.markdown("---")
@@ -1754,39 +2166,54 @@ def render_alertas_anomalias_v2(engine, periodos, periodo_padrao):
 def render_analise_pagamentos_v2(engine, periodos, periodo_padrao):
     st.header("💰 Análise de Pagamentos")
     st.markdown("Explore os dados de pagamentos de ICMS, tendências temporais e empresas com maiores contribuições.")
-    
+
+    # Seção de ajuda expandível
+    with st.expander("ℹ️ Entenda os indicadores desta seção", expanded=False):
+        render_help_section("📊 Indicadores de Pagamentos", [
+            ("💵", "**Total Pago**: Soma de todos os pagamentos de ICMS realizados no período."),
+            ("📋", "**Qtd Pagamentos**: Número total de guias/documentos de pagamento processados."),
+            ("🏢", "**Empresas Pagantes**: CNPJs distintos que realizaram pelo menos um pagamento."),
+            ("💳", "**Ticket Médio**: Valor médio por pagamento (Total / Quantidade)."),
+            ("⚠️", "**Divergência**: Diferença > 30% entre ICMS declarado e valor pago indica possível inadimplência.")
+        ])
+
     # Filtro de período
-    periodo = st.selectbox("📅 Período de Referência", periodos, index=0)
-    
+    periodo = st.selectbox("📅 Período de Referência", periodos, index=0,
+                          help="Selecione o período para análise dos pagamentos de ICMS.")
+
     # Carregar dados de pagamentos
     with st.spinner("Carregando dados de pagamentos..."):
         df_pagamentos = carregar_pagamentos(engine, periodo)
         df_empresas = carregar_empresa_vs_benchmark(engine, periodo)
-    
+
     if df_pagamentos.empty:
         st.warning("⚠️ Dados de pagamentos não disponíveis")
         return
-    
+
     # Métricas principais
     st.subheader("📊 Indicadores Gerais")
-    
+
     col1, col2, col3, col4 = st.columns(4)
-    
+
     with col1:
         total_pago = df_pagamentos['valor_total_pago'].sum() if 'valor_total_pago' in df_pagamentos.columns else 0
-        st.metric("💵 Total Pago", f"R$ {total_pago/1e9:.2f}B")
-    
+        st.metric("💵 Total Pago", f"R$ {total_pago/1e9:.2f}B",
+                 help=TOOLTIPS["total_pago"])
+
     with col2:
         total_pagamentos = df_pagamentos['qtd_pagamentos'].sum() if 'qtd_pagamentos' in df_pagamentos.columns else 0
-        st.metric("📋 Qtd Pagamentos", f"{total_pagamentos:,.0f}")
-    
+        st.metric("📋 Qtd Pagamentos", f"{total_pagamentos:,.0f}",
+                 help=TOOLTIPS["qtd_pagamentos"])
+
     with col3:
         empresas_pagantes = df_pagamentos[df_pagamentos['valor_total_pago'] > 0]['nu_cnpj'].nunique() if 'valor_total_pago' in df_pagamentos.columns else 0
-        st.metric("🏢 Empresas Pagantes", f"{empresas_pagantes:,}")
-    
+        st.metric("🏢 Empresas Pagantes", f"{empresas_pagantes:,}",
+                 help=TOOLTIPS["empresas_pagantes"])
+
     with col4:
         ticket_medio = total_pago / total_pagamentos if total_pagamentos > 0 else 0
-        st.metric("💳 Ticket Médio", f"R$ {ticket_medio:,.2f}")
+        st.metric("💳 Ticket Médio", f"R$ {ticket_medio:,.2f}",
+                 help=TOOLTIPS["ticket_medio"])
     
     # Evolução temporal
     st.markdown("---")
@@ -1927,18 +2354,20 @@ def render_analise_pagamentos_v2(engine, periodos, periodo_padrao):
                 
                 if not df_div.empty:
                     col1, col2 = st.columns(2)
-                    
+
                     with col1:
                         st.metric(
                             "🔴 Empresas com Divergência > 30%",
-                            f"{len(df_div):,}"
+                            f"{len(df_div):,}",
+                            help=TOOLTIPS["divergencia_pagamento"]
                         )
-                    
+
                     with col2:
                         dif_total = df_div['diferenca'].sum()
                         st.metric(
                             "💰 Diferença Total",
-                            f"R$ {dif_total/1e6:.2f}M"
+                            f"R$ {dif_total/1e6:.2f}M",
+                            help="Soma das diferenças entre ICMS declarado e valor efetivamente pago para todas as empresas com divergência significativa."
                         )
                     
                     # Tabela de divergências
@@ -1987,15 +2416,27 @@ def render_analise_pagamentos_v2(engine, periodos, periodo_padrao):
 def render_machine_learning_v2(engine, periodos, periodo_padrao):
     st.header("🤖 Modelos Preditivos (Machine Learning)")
     st.markdown("Utilize modelos de ML para identificar padrões e prever comportamentos de risco fiscal.")
-    
+
+    # Seção de ajuda expandível
+    with st.expander("ℹ️ Entenda os indicadores desta seção", expanded=False):
+        render_help_section("📊 Métricas de Machine Learning", [
+            ("🎯", "**Acurácia**: % de previsões corretas. Boa métrica geral, mas pode ser enganosa com dados desbalanceados."),
+            ("✅", "**Precisão**: Dos previstos como problemáticos, quantos realmente são. Evita falsos positivos."),
+            ("🔍", "**Recall**: Dos realmente problemáticos, quantos foram identificados. Evita falsos negativos."),
+            ("⚖️", "**F1-Score**: Média harmônica entre Precisão e Recall. Melhor métrica para dados desbalanceados."),
+            ("📈", "**Prob. Risco**: Probabilidade (0-100%) calculada pelo modelo de uma empresa ser problemática.")
+        ])
+        st.info("💡 O modelo utiliza features como alíquota, faturamento, porte e flags de divergência para prever o risco.")
+
     from sklearn.ensemble import GradientBoostingClassifier, RandomForestClassifier
     from sklearn.model_selection import train_test_split
     from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
     from sklearn.preprocessing import StandardScaler
-    
+
     # Filtro de período
-    periodo = st.selectbox("📅 Período de Referência", periodos, index=0)
-    
+    periodo = st.selectbox("📅 Período de Referência", periodos, index=0,
+                          help="Período dos dados para treinar e aplicar o modelo preditivo.")
+
     # NÃO carrega dados automaticamente - apenas sob demanda
     st.info("💡 Clique no botão abaixo para carregar os dados e treinar o modelo")
     
@@ -2089,22 +2530,38 @@ def render_machine_learning_v2(engine, periodos, periodo_padrao):
                 # Métricas
                 st.markdown("### 📈 Performance do Modelo")
                 col1, col2, col3, col4 = st.columns(4)
-                
+
                 with col1:
                     acc = accuracy_score(y_test, y_pred)
-                    st.metric("Acurácia", f"{acc:.2%}")
-                
+                    acc_status = "🟢 Bom" if acc >= 0.8 else ("🟡 Regular" if acc >= 0.6 else "🔴 Baixo")
+                    st.metric("Acurácia", f"{acc:.2%}",
+                             delta=acc_status,
+                             delta_color="off",
+                             help=TOOLTIPS["acuracia"])
+
                 with col2:
                     prec = precision_score(y_test, y_pred, zero_division=0)
-                    st.metric("Precisão", f"{prec:.2%}")
-                
+                    prec_status = "🟢 Bom" if prec >= 0.7 else ("🟡 Regular" if prec >= 0.5 else "🔴 Baixo")
+                    st.metric("Precisão", f"{prec:.2%}",
+                             delta=prec_status,
+                             delta_color="off",
+                             help=TOOLTIPS["precisao"])
+
                 with col3:
                     rec = recall_score(y_test, y_pred, zero_division=0)
-                    st.metric("Recall", f"{rec:.2%}")
-                
+                    rec_status = "🟢 Bom" if rec >= 0.7 else ("🟡 Regular" if rec >= 0.5 else "🔴 Baixo")
+                    st.metric("Recall", f"{rec:.2%}",
+                             delta=rec_status,
+                             delta_color="off",
+                             help=TOOLTIPS["recall"])
+
                 with col4:
                     f1 = f1_score(y_test, y_pred, zero_division=0)
-                    st.metric("F1-Score", f"{f1:.2%}")
+                    f1_status = "🟢 Bom" if f1 >= 0.7 else ("🟡 Regular" if f1 >= 0.5 else "🔴 Baixo")
+                    st.metric("F1-Score", f"{f1:.2%}",
+                             delta=f1_status,
+                             delta_color="off",
+                             help=TOOLTIPS["f1_score"])
                 
                 # Matriz de confusão
                 col1, col2 = st.columns(2)
@@ -2254,10 +2711,20 @@ def render_machine_learning_v2(engine, periodos, periodo_padrao):
 
 def render_analises_avancadas_v2(engine, periodos, periodo_padrao):
     st.header("📊 Análises Avançadas")
-    
+
+    # Seção de ajuda expandível
+    with st.expander("ℹ️ Sobre as Análises Avançadas", expanded=False):
+        render_help_section("📊 Análises Disponíveis", [
+            ("📈", "**Evolução Temporal**: Acompanhe a variação dos indicadores ao longo do tempo para os principais setores."),
+            ("🎯", "**Volatilidade**: Identifique setores com comportamento instável que podem indicar riscos."),
+            ("💰", "**ICMS vs Pagamentos**: Compare valores declarados e pagos para detectar divergências."),
+            ("🔍", "**Comparações**: Compare métricas entre diferentes setores para identificar outliers.")
+        ])
+
     # Filtro de período
-    periodo = st.selectbox("📅 Período de Referência", periodos, index=0)
-    
+    periodo = st.selectbox("📅 Período de Referência", periodos, index=0,
+                          help="Período base para as análises avançadas.")
+
     tabs = st.tabs([
         "📈 Evolução Temporal",
         "🎯 Volatilidade",
